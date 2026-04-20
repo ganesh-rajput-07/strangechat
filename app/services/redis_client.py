@@ -7,16 +7,20 @@ class RedisClient:
     def __init__(self):
         self.redis_client = None
 
-    def connect(self):
-        """Connect to Redis"""
         self.redis_client = redis.Redis(
-            host=os.getenv("REDIS_HOST", "localhost"),
+            host=os.getenv("REDIS_HOST"),
             port=int(os.getenv("REDIS_PORT", 6379)),
-            db=int(os.getenv("REDIS_DB", 0)),
-            decode_responses=True
+            password=os.getenv("REDIS_PASSWORD"),  # 🔥 important
+            db=int(os.getenv("REDIS_DB", 0)),      # default is fine
+            decode_responses=True,
+            ssl=True  # 🔥 Leapcell usually requires SSL
         )
         # Test connection 
-        self.redis_client.ping()
+            try:
+                self.redis_client.ping()
+                print("✅ Redis connected successfully")
+            except Exception as e:
+                print("❌ Redis connection failed:", e)
 
     def add_to_queue(self, user_id: str):
         """Add user to waiting queue"""
